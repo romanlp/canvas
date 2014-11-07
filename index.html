@@ -1,0 +1,93 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8"/>
+  <title>Canvas!!</title>
+  <link rel="stylesheet" type="text/css" href="bootstrap.min.css">
+  <style type="text/css">
+    body{
+      background: #aaddff;
+    }
+    canvas{
+      background: #ffffff;
+    }
+  </style>
+  <script src="canvas.js"></script>
+</head>
+
+<body>
+  <div>
+    <canvas>Please upgrade your browser</canvas>
+  </div>
+
+  <div class="container">
+
+    <div class="row">
+      <div class="col-md-12">
+        <p>
+          
+        </p>
+      </div>
+    </div>
+
+    <div class="row">
+      <div class="col-md-12">
+        <p>
+          <input class="btn btn-primary" type="button" id='RandomColor' value="Random Color" >
+          <input class="btn btn-primary" type="button" value="Random Dark Color" onclick="setColor('dark')">
+          <input class="btn btn-primary" type="button" value="Random Light Color" onclick="setColor('light')">
+          <input class="btn btn-primary" type="button" value="Random Blue" onclick="setColor('blue')">
+          <input class="btn btn-primary" type="button" value="Random Red" onclick="setColor('red')">
+          <input class="btn btn-primary" type="button" value="Random Green" onclick="setColor('green')">
+        </p>
+      </div>
+    </div>
+    <div class="row">
+      <div class="form-inline">
+        <p>
+          <input class="btn btn-primary" type="button" value="Full Random" onclick="colorObj.setRandom(true)">
+          <input class="btn btn-primary" type="button" value="Disable Full Random" onclick="colorObj.setRandom(false)">
+        </p>
+      </div>
+    </div>
+    <div class="row">
+      <div class="col-md-12">
+        <p>
+          <input class="btn btn-primary" type="button" value="CERCLE" onclick="switchShape('circle')">
+          <input class="btn btn-primary" type="button" value="RECTANGLE" onclick="switchShape('rect')">
+          <input class="btn btn-primary" type="button" value="CARRE" onclick="switchShape('square')">
+          <input class="btn btn-primary" type="button" value="LIGNE" onclick="switchShape('line')">
+          <input class="btn btn-primary" type="button" value="IMAGE" onclick="switchShape('image')">
+          <input type="file" id="ImageToLoad">
+        </p>
+      
+      <form class="form-inline">
+        <div class="form-group">
+          <input class="form-control" type="text" id="textToWrite" value="Mon Texte">
+        </div>
+        <input class="btn btn-primary" type="button" value="TEXTE" onclick="switchShape('text')">
+      </form>
+
+      </div>
+    </div>
+    <div class="row">
+      <div class="col-md-2">
+        <p>Taille du curseur :<input type="range" id="taille" step="1" value="5" min="1" max="20" onchange="updateTailleInput(this.value);"></p>
+      </div>
+      <div class="col-md-8">
+        <p>Générer des formes avec les paramètres choisis :<input class="btn btn-primary" type="button" value="Générer" onclick="drawRandomCircle()"></p>
+        <p>Générer un fond avec les paramètres choisis :<input class="btn btn-primary" type="button" value="Générer" onclick="fillCanvas()"></p>
+      </div>
+    </div>
+    <div class="row">
+      <div class="col-md-2">
+        <p><input class="btn btn-primary" type="button" value="CLEAR" onclick="clearCanvas()"></p>
+      </div>
+      
+    </div>
+
+  </div>
+</body>
+</html>
+
+onclick="setColor('random')"
