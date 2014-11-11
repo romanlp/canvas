@@ -33,7 +33,7 @@
     <div class="row">
       <div class="col-md-12">
         <p>
-          <input class="btn btn-primary" type="button" id='RandomColor' value="Random Color" >
+          <input class="btn btn-primary" type="button" value="Random Color" onclick="setColor('random')">
           <input class="btn btn-primary" type="button" value="Random Dark Color" onclick="setColor('dark')">
           <input class="btn btn-primary" type="button" value="Random Light Color" onclick="setColor('light')">
           <input class="btn btn-primary" type="button" value="Random Blue" onclick="setColor('blue')">
@@ -58,7 +58,6 @@
           <input class="btn btn-primary" type="button" value="CARRE" onclick="switchShape('square')">
           <input class="btn btn-primary" type="button" value="LIGNE" onclick="switchShape('line')">
           <input class="btn btn-primary" type="button" value="IMAGE" onclick="switchShape('image')">
-          <input type="file" id="ImageToLoad">
         </p>
       
       <form class="form-inline">
@@ -75,7 +74,7 @@
         <p>Taille du curseur :<input type="range" id="taille" step="1" value="5" min="1" max="20" onchange="updateTailleInput(this.value);"></p>
       </div>
       <div class="col-md-8">
-        <p>Générer des formes avec les paramètres choisis :<input class="btn btn-primary" type="button" value="Générer" onclick="drawRandomCircle()"></p>
+        <p>Générer des formes avec les paramètres choisis :<input class="btn btn-primary" type="button" value="Générer" onclick="drawRandom()"></p>
         <p>Générer un fond avec les paramètres choisis :<input class="btn btn-primary" type="button" value="Générer" onclick="fillCanvas()"></p>
       </div>
     </div>
@@ -89,5 +88,3 @@
   </div>
 </body>
 </html>
-
-onclick="setColor('random')"

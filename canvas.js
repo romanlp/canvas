@@ -15,6 +15,7 @@ function Painter(canvas){
 	this.x = 0;
 	this.y = 0;
 	this.shape = 'circle';
+	this.text = 'Mon Texte';
 
 	this.drawCircle = function(x,y,color) {
 		this.ctxt.beginPath();
@@ -44,18 +45,19 @@ Painter.prototype.drawSquare = function  (x,y,color) {
 	ctxt.fill();
 }
 
-Painter.prototype.drawLine = function  (x,y,color, oldX, oldY) {
+Painter.prototype.drawLine = function  (x2,y2,color, oldX, oldY) {
 	ctxt.beginPath();
 	ctxt.moveTo(oldX,oldY);
-	ctxt.lineTo(x,y);
+	ctxt.lineTo(x2,y2);
 	ctxt.strokeStyle = color;
+	ctxt.stroke();
 }
 
 Painter.prototype.drawText = function  (x,y,color) {
 	ctxt.beginPath();
 	ctxt.font = "30px Arial";
-	ctxt.strokeStyle = color;
-	ctxt.fillText(document.getElementById('textToWrite').value,x,y);
+	ctxt.fillStyle = color;
+	ctxt.fillText(this.text,x,y);
 
 }
 
@@ -110,35 +112,37 @@ Painter.prototype.switchShape = function (shape){
 	}
 }
 
-Painter.prototype.drawFromServer = function(shape, x, y, color, oldX, oldY){
-	this.switchShape(shape);
-	this.draw(x, y, color, oldX, oldY);
+Painter.prototype.drawFromServer = function(point){
+	this.switchShape(point.shape);
+	this.text = point.text;
+	this.draw(point.x, point.y, point.color, point.oldX, point.oldY);
 }
 
 Painter.prototype.move = function (eventX, eventY) {
 	if(this.drawOnSecond){
-		if(x > eventX+25 || x < eventX-25 || y > eventY+25 || y < eventY-25){
+		//if(this.x > eventX+25 || this.x < eventX-25 || this.y > eventY+25 || this.y < eventY-25){
 			var colorTmp = colorObj.getColor();
-			this.draw(this.x,this.y, colorTmp, eventX, eventY);
+			this.drawAndSend(this.x,this.y, colorTmp, eventX, eventY);
 			this.x = eventX;
 			this.y = eventY;
-		}
+		//}
 		ctxt.stroke();
+	}	
+}
 
+Painter.prototype.drawAndSend = function (x,y,color, eventX, eventY){
 
-		/*return*/ 
-		var point = { 
-			shape: this.shape,
-			x: this.x, 
-			y: this.y,
-			color: colorTmp,
-			oldX: eventX,
-			oldY: eventY,
-		};
-		ws.send(JSON.stringify(point));
-	}
-
-	
+	var point = { 
+		shape: this.shape,
+		x: x, 
+		y: y,
+		color: color,
+		oldX: eventX,
+		oldY: eventY,
+		text: document.getElementById('textToWrite').value,
+	};
+	//this.draw(x,y, color, eventX, eventY);
+	ws.send(JSON.stringify(point));
 }
 
 /*
@@ -197,14 +201,20 @@ function setColor (color) {
 	colorObj.panel = color;	
 }
 
-function drawRandomCircle() {
+/**
+* Dessine 100 elements avec les parametres du painter
+*/
+function drawRandom() {
+	xFin = Math.floor(Math.random()*xCanvas);
+	yFin = Math.floor(Math.random()*yCanvas);
 	ctxt.beginPath();
 	colorObj.randomColor();
 	for (var i = 0; i < 100; i++) {
 
-		x = Math.random()*xCanvas;
-		y = Math.random()*yCanvas;
-		painter.draw(x,y, colorObj.getColor());
+		x = Math.floor(Math.random()*xCanvas);
+		y = Math.floor(Math.random()*yCanvas);
+		console.log(x,y);
+		painter.drawAndSend(x,y, colorObj.getColor(), xFin,yFin);
 	}
 
 }
@@ -213,7 +223,7 @@ function fillCanvas(){
 	colorObj.randomColor();
 	for (var i = 0; i < xCanvas; i = i+10) {
 		for (var j = 0; j < yCanvas; j = j+5) {
-			painter.draw(i,j, colorObj.getColor());
+			painter.drawAndSend(i,j, colorObj.getColor());
 		};
 	};
 }
@@ -247,45 +257,24 @@ function disableDraw(){
 }
 
 function move (event) {
-	
-	point = painter.move(event.pageX, event.pageY);
+	painter.move(event.pageX, event.pageY);
 }
 
 function drawOne(event) {
-	point = painter.draw(x,y, colorObj.getColor(), event.pageX, event.pageY);
+	painter.drawAndSend(painter.x,painter.y, colorObj.getColor(), event.pageX, event.pageY);
 	x = event.pageX;
 	y = event.pageY;
-	//ws.send(JSON.stringify(point));
 }
 
 function switchShape(shape) {
 	painter.switchShape(shape);
 }
 
+/**
+* Le clear n'est pas envoyé au serveur
+*/
 function clearCanvas(){
 	painter.clearCanvas();
-}
-
-// Serialize coordinates then send to the server
-/*function send(shape, x, y, color, oldX, oldY) {
-	var point = { 
-		shape: shape,
-		x: event.pageX, 
-		y: event.pageY,
-		color: color,
-		oldX: oldX,
-	};
-	ws.send(JSON.stringify(point));
-}*/
-
-function draw(point) {
-	var x = point.x;
-	var y = point.y;
-
-	ctxt.beginPath();
-	ctxt.moveTo(x, y);
-	ctxt.lineTo(x + 1, y + 1);
-	ctxt.stroke();
 }
 
 // Setup WebSocket
@@ -299,5 +288,8 @@ ws.onclose = function() { console.log('DISCONNECTED'); };
 ws.onmessage = function(event) {
 	// Need to unserialize data first
 	var point = JSON.parse(event.data);
-	painterServer.drawFromServer(point.shape, point.x, point.y, point.color, point.oldX, point.oldY);
+	console.log(point);
+	painterServer.x = point.x;
+	painterServer.y = point.y;
+	painterServer.drawFromServer(point);
 };
