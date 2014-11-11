@@ -6,6 +6,7 @@ var xCanvas = 800;
 var yCanvas = 600;
 var ctxt;
 var painter;
+var painterServer;
 
 function Painter(canvas){
 	this.canvas = canvas;
@@ -13,6 +14,7 @@ function Painter(canvas){
 
 	this.x = 0;
 	this.y = 0;
+	this.shape = 'circle';
 
 	this.drawCircle = function(x,y,color) {
 		this.ctxt.beginPath();
@@ -20,9 +22,6 @@ function Painter(canvas){
 		this.ctxt.strokeStyle = color;
 		this.ctxt.fillStyle = color;
 		this.ctxt.fill();
-
-		var point = { x: x, y: y, color:color };
-		ws.send(JSON.stringify(point));
 	};
 	this.penSize = 5;
 	this.drawOnSecond = false;
@@ -86,6 +85,7 @@ Painter.prototype.clearCanvas = function () {
 }
 
 Painter.prototype.switchShape = function (shape){
+	this.shape = shape;
 	switch(shape){
 		case 'circle':
 		this.draw = this.drawCircle;
@@ -110,15 +110,35 @@ Painter.prototype.switchShape = function (shape){
 	}
 }
 
+Painter.prototype.drawFromServer = function(shape, x, y, color, oldX, oldY){
+	this.switchShape(shape);
+	this.draw(x, y, color, oldX, oldY);
+}
+
 Painter.prototype.move = function (eventX, eventY) {
 	if(this.drawOnSecond){
 		if(x > eventX+25 || x < eventX-25 || y > eventY+25 || y < eventY-25){
-			this.draw(x,y, colorObj.getColor(), eventX, eventY);
-			x = eventX;
-			y = eventY;
+			var colorTmp = colorObj.getColor();
+			this.draw(this.x,this.y, colorTmp, eventX, eventY);
+			this.x = eventX;
+			this.y = eventY;
 		}
 		ctxt.stroke();
+
+
+		/*return*/ 
+		var point = { 
+			shape: this.shape,
+			x: this.x, 
+			y: this.y,
+			color: colorTmp,
+			oldX: eventX,
+			oldY: eventY,
+		};
+		ws.send(JSON.stringify(point));
 	}
+
+	
 }
 
 /*
@@ -213,6 +233,7 @@ function init() {
 	canvas.addEventListener('click', drawOne);
 
 	painter = new Painter(canvas);
+	painterServer = new Painter(canvas);
 }
 
 function enableDraw(){
@@ -226,15 +247,15 @@ function disableDraw(){
 }
 
 function move (event) {
-	var point = { x: event.pageX, y: event.pageY };
-	//ws.send(JSON.stringify(point));
-	painter.move(event.pageX, event.pageY);
+	
+	point = painter.move(event.pageX, event.pageY);
 }
 
 function drawOne(event) {
-	painter.draw(x,y, colorObj.getColor(), event.pageX, event.pageY);
+	point = painter.draw(x,y, colorObj.getColor(), event.pageX, event.pageY);
 	x = event.pageX;
 	y = event.pageY;
+	//ws.send(JSON.stringify(point));
 }
 
 function switchShape(shape) {
@@ -246,10 +267,16 @@ function clearCanvas(){
 }
 
 // Serialize coordinates then send to the server
-function send(event) {
-	var point = { x: event.pageX, y: event.pageY };
+/*function send(shape, x, y, color, oldX, oldY) {
+	var point = { 
+		shape: shape,
+		x: event.pageX, 
+		y: event.pageY,
+		color: color,
+		oldX: oldX,
+	};
 	ws.send(JSON.stringify(point));
-}
+}*/
 
 function draw(point) {
 	var x = point.x;
@@ -272,5 +299,5 @@ ws.onclose = function() { console.log('DISCONNECTED'); };
 ws.onmessage = function(event) {
 	// Need to unserialize data first
 	var point = JSON.parse(event.data);
-	painter.draw(point.x, point.y, point.color);
+	painterServer.drawFromServer(point.shape, point.x, point.y, point.color, point.oldX, point.oldY);
 };
