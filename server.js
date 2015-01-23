@@ -13,6 +13,7 @@ serve('/', 'index.html');
 serve('/canvas.js', 'canvas.js');
 serve('/bootstrap.min.css', 'bootstrap.min.css');
 serve('/img/img1.png', 'img/img1.png');
+serve('/img/perso1.png', 'img/perso1.png');
 // Add any file you need here, like jquery
 //serve('/jquery.js', 'jquery.js');
 

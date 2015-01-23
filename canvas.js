@@ -27,6 +27,7 @@ function Painter(canvas){
 	this.penSize = 5;
 	this.drawOnSecond = false;
 	this.draw = this.drawCircle;
+
 }
 
 Painter.prototype.drawRectangle = function  (x,y,color) {
@@ -242,8 +243,117 @@ function init() {
 	canvas.addEventListener('mousemove', move);
 	canvas.addEventListener('click', drawOne);
 
+	window.addEventListener('keydown', keyPressed, true);
+
+
 	painter = new Painter(canvas);
 	painterServer = new Painter(canvas);
+
+
+	ctxt.beginPath();
+
+	personnage = new Personnage(100, 100);
+	personnage.image.onload = function(){
+		personnage.draw(100,100);
+	}
+	
+
+
+}
+
+function keyPressed(event) {
+	switch (String.fromCharCode(event.keyCode)) {
+		case"Z":
+		personnage.move("up");
+		break;
+		case"S":
+		personnage.move("down");
+		break;
+		case"Q":
+		personnage.move("left");
+		break;
+		case"D":
+		personnage.move("right");
+		break;
+
+	}
+
+	console.log("toto"+event.keyCode+String.fromCharCode(event.keyCode));
+	personnage.draw(50,50);
+}
+
+function Personnage(x, y){
+	this.x = x;
+	this.y = y;
+
+	this.spriteX = 0;
+	this.spriteY = 0;
+
+	console.log(this.x + this.y);
+	var widthImage;
+	var heightImage;
+	this.draw = function(){
+		widthImage = image.width;
+		heightImage = image.height;
+		ctxt.drawImage(image, this.spriteX * widthImage/4, this.spriteY * heightImage/4, widthImage/4, heightImage/4, this.x, this.y, widthImage/4, heightImage/4);
+
+	}
+
+	var image = new Image();
+	image.src = "img/perso1.png";
+}
+
+Personnage.prototype.move = function(direction){
+	
+	var newX = 0;
+	var newY = 0;
+	if(direction == "up"){
+		newY = -50;
+		this.spriteX = 0;
+		this.spriteY = 3;
+	}
+	else if(direction == "down"){
+		newY = 50;
+		this.spriteX = 0;
+		this.spriteY = 0;
+	}
+	else if(direction == "left"){
+		newX = -50;
+		this.spriteX = 0;
+		this.spriteY = 1;
+	}
+	else if(direction == "right"){
+		newX = 50;
+		this.spriteX = 0;
+		this.spriteY = 2;
+	}
+	var i = 0;
+	var start = new Date().getTime();
+	var milliseconds = 0;
+	while(i<3){
+		if ((new Date().getTime() - start) > milliseconds){
+			console.log(this.spriteX);
+			this.x += (newX/4);
+			this.y += (newY/4);
+			this.spriteX += 1;
+			this.clean();
+			this.draw();
+			i++;
+			start = new Date().getTime();
+		}
+		
+	}
+	this.x += (newX/4);
+	this.y += (newY/4);
+	this.spriteX = 0;
+	this.clean();
+	this.draw();
+	i++;
+	console.log('draw : x='+this.x+' y='+this.y);
+}
+
+Personnage.prototype.clean = function () {
+	ctxt.clearRect ( 0 , 0 , xCanvas, yCanvas );
 }
 
 function enableDraw(){
