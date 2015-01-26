@@ -22,7 +22,7 @@ function serve(url, file) {
   // Assuming files are in the current directory;
   var fullpath = path.resolve(file);
   app.get(url, function(req, res) {
-    res.sendfile(fullpath);
+    res.sendFile(fullpath);
   });
 }
 
