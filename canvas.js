@@ -329,8 +329,9 @@ Personnage.prototype.move = function(direction){
 	}
 	var i = 0;
 	var start = new Date().getTime();
-	var milliseconds = 0;
+	var milliseconds = 1000;
 	while(i<3){
+		//console.log((new Date().getTime() - start));
 		if ((new Date().getTime() - start) > milliseconds){
 			console.log(this.spriteX);
 			this.x += (newX/4);
@@ -339,6 +340,7 @@ Personnage.prototype.move = function(direction){
 			this.clean();
 			this.draw();
 			i++;
+			console.log(i);
 			start = new Date().getTime();
 		}
 		
